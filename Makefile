@@ -35,5 +35,5 @@ chunk.o:		$(CHUNK_FILES)
 	$(CC) -c $< -o $(@)
 
 clean:
-	rm foo *~
+	rm foo *~ *.o
 
