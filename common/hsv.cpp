@@ -4,8 +4,6 @@
 
 #include <stdio.h>
 
-typedef unsigned int UInt32;
-typedef unsigned char UInt8;
 
 static UInt32 hsv2rgb(UInt32 hsv) __attribute__ ((unused));
 static UInt32 rgb2hsv(UInt32 rgb) __attribute__ ((unused));
