@@ -11,7 +11,6 @@ fatal(const char * const fmt, ...)
   va_list args;
   va_start(args, fmt);
   vfprintf(stderr, fmt, args);
-  fprintf(stderr, "\n");
   va_end(args);
   exit(1);
 }
@@ -53,7 +52,7 @@ Malloc(size_t n)
 {
   void *p = malloc(n);
   if (p == NULL) {
-    fatal("Malloc(%d): %s", (int) n, syserr());
+    fatal("Malloc(%d): %s\n", (int) n, syserr());
   }
   return p;
 }
@@ -67,15 +66,15 @@ Readfile(const char * const fn, UInt32 *size)
   SInt32 fd;
 
   if ((fd = open(fn, O_RDONLY)) < 0) {
-    fatal("Readfile: Cannot open %s: %s", fn, syserr());
+    fatal("Readfile: Cannot open %s: %s\n", fn, syserr());
   }
   if (fstat(fd, &statbuf) != 0) {
-    fatal("Cannot stat %s: %s", fn, syserr());
+    fatal("Cannot stat %s: %s\n", fn, syserr());
   }
   filesize = (size_t) statbuf.st_size;
   data = (UInt8 *) Malloc(filesize);
   if (read(fd, data, (size_t) filesize) != (ssize_t) filesize) {
-    fatal("read error, %s: %s", fn, syserr());
+    fatal("read error, %s: %s\n", fn, syserr());
   }
   close(fd);
   if (size != NULL) {

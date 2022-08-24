@@ -21,9 +21,9 @@ struct args {
 static void
 do_usage(const struct args *ap, const char *usage)
 {
-  epf("%s", usage);
+  epf("%s\n", usage);
   while (ap->arg != NULL) {
-    epf(" %12s %s", ap->arg, ap->desc);
+    epf(" %12s %s\n", ap->arg, ap->desc);
     ++ap;
   }
   exit(1);
@@ -37,7 +37,7 @@ doCommandLineArgs(SInt *argcp, char ***argvp, const struct args *ap, SInt32 minp
   while (argc > 1 && argv[1][0] == '-') {
     for (UInt32 i = 0; ; ++i) {
       if (ap[i].arg == NULL) {
-        epf("Bad flag: %s", argv[1]);
+        epf("Bad flag: %s\n", argv[1]);
         do_usage(ap, usage);
       }
       if (strcmp(argv[1], ap[i].arg) == 0) {
@@ -70,7 +70,7 @@ doCommandLineArgs(SInt *argcp, char ***argvp, const struct args *ap, SInt32 minp
 	      Assert(0);
 	    }
 	    if (*endptr != '\0') {
-	      epf("Invalid argument for %s: %s", argv[1], argv[2]);
+	      epf("Invalid argument for %s: %s\n", argv[1], argv[2]);
 	      do_usage(ap, usage);
 	    }
 	  }

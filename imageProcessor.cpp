@@ -150,7 +150,7 @@ image::normalizeImage(bool doSat, bool doVal, bool ignoreMask)
   Assert(imgAvgSat < 256);
   Assert(imgAvgVal < 256);
   
-  epf("image avg sat:%d val:%d", imgAvgSat, imgAvgVal);
+  epf("image avg sat:%d val:%d\n", imgAvgSat, imgAvgVal);
   
   UInt dy = ImageHeight / NormVerticalBlocks;
   UInt dx = ImageWidth  / NormHorizontalBlocks;
@@ -436,13 +436,13 @@ image::saveMapToFile(void){
   poop = open(fn, O_WRONLY|O_CREAT|O_TRUNC, 0666);
   epf("poop=%d\n", poop);
   if (poop < 0) {
-    fatal("Open failed, %s: %s", fn, syserr());
+    fatal("Open failed, %s: %s\n", fn, syserr());
   }
   int n = sizeof(diffFromMean);
   Assert(n == sizeof(double) * ImageWidth * ImageHeight);
   int w = write(poop, diffFromMean, n);
   if (w != n) {
-    fatal("Write failed, %s: %s", fn, syserr());
+    fatal("Write failed, %s: %s\n", fn, syserr());
   }
   close(poop);
 }

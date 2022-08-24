@@ -14,8 +14,6 @@
 #include <jpeglib.h>
 #include <png.h>
 
-
-
 #include <cstdarg>
 #include <cstdio>
 
@@ -269,7 +267,7 @@ refloodChunk(int chunkIndex, int startingNewFloodValue) {
     for (int x = x0; x < x1; x++) {
       if (g.currentImage.floodedMask[y][x] == oldFloodValue) {
 	refloodFromThisPixelInRange(x, y, x0, y0, x1, y1, oldFloodValue, startingNewFloodValue);
-	epf("reflooded %d to new value %d", oldFloodValue, startingNewFloodValue);
+	epf("reflooded %d to new value %d\n", oldFloodValue, startingNewFloodValue);
 	startingNewFloodValue++;
       }
     }
@@ -281,13 +279,13 @@ refloodChunk(int chunkIndex, int startingNewFloodValue) {
       if (g.currentImage.floodedMask[y][x] == highestValue) {
 	assert(!alreadyDoubleReflooded);//should only go once
 	alreadyDoubleReflooded = true;
-	epf("re-reflooded %d to old value %d", highestValue, oldFloodValue);
+	epf("re-reflooded %d to old value %d\n", highestValue, oldFloodValue);
 	refloodFromThisPixelInRange(x, y, x0, y0, x1, y1, highestValue, oldFloodValue);
       }
     }
   }
 
-  epf("highest value is %d", highestValue);
+  epf("highest value is %d\n", highestValue);
   return highestValue;
 }
 
@@ -321,7 +319,7 @@ calculateChunks(int numChunks) {
       }
     }
     if(!(numPix > 0)){
-      epf("chunk value %d has no pixels", chunk);
+      epf("chunk value %d has no pixels\n", chunk);
       assert(false);
     }
     int w = maxX-minX+1;
@@ -343,9 +341,9 @@ int
 splitChunk(int chunkIndexToSplit, int startingNewChunkValue, bool horizontalSplit) {
   splitChunkInHalf(chunkIndexToSplit, horizontalSplit, startingNewChunkValue);
   startingNewChunkValue++;
-  epf("reflooding chunk %d", g.currentImage.chunkInfo[chunkIndexToSplit].floodValue);
+  epf("reflooding chunk %d\n", g.currentImage.chunkInfo[chunkIndexToSplit].floodValue);
   startingNewChunkValue = refloodChunk(chunkIndexToSplit, startingNewChunkValue);
-  epf("reflooding chunk %d", g.currentImage.chunkInfo[g.currentImage.chunkInfo.size()-1].floodValue);
+  epf("reflooding chunk %d\n", g.currentImage.chunkInfo[g.currentImage.chunkInfo.size()-1].floodValue);
   startingNewChunkValue = refloodChunk(g.currentImage.chunkInfo.size()-1, startingNewChunkValue);
   return startingNewChunkValue;
 }
@@ -403,7 +401,7 @@ doFloodingUsingMask() {
   }
   
   int numChunks = chunkID;
-  epf("calculating initial chunks num of %d", numChunks);
+  epf("calculating initial chunks num of %d\n", numChunks);
   calculateChunks(numChunks);
 
   int maxSideLength = 400;
@@ -412,15 +410,15 @@ doFloodingUsingMask() {
     int h = g.currentImage.chunkInfo[i].h;
     if (w>h) {
       if (w > maxSideLength) {
-	epf("splitchunk");
+	epf("splitchunk\n");
 	numChunks = splitChunk(i, numChunks, false);
-	epf("num chunks is now %d", numChunks);
+	epf("num chunks is now %d\n", numChunks);
       }
     }else{
       if (h > maxSideLength) {
-	epf("splitchunk");
+	epf("splitchunk\n");
 	numChunks = splitChunk(i, numChunks, true);
-	epf("num chunks is now %d", numChunks);
+	epf("num chunks is now %d\n", numChunks);
       }
     }
   }
@@ -450,7 +448,7 @@ doFloodingUsingMask() {
       }
     }
   }
-  epf("calculating post split chunks max of %d", numChunks);
+  epf("calculating post split chunks max of %d\n", numChunks);
   calculateChunks(numChunks);
   //destroyBadChunks();
   if(colorChunks){
@@ -491,7 +489,7 @@ void
 saveThresholdedImage(void)
 {
   pngWriteRgbPixelsToFile("chunks/outputThing.png", &g.currentImage.rgbData[0][0][0], ImageWidth, ImageHeight);
-  epf("image saved");
+  epf("image saved\n");
 }
 
 int
@@ -522,11 +520,11 @@ saveFloodedRegions(void)
   int startingNum = getLastNumber();
   char filename[256];
   int n = g.currentImage.chunkInfo.size();
-  epf("Saving %d flooded regions", n);
+  epf("Saving %d flooded regions\n", n);
   UInt8 *pixels = (UInt8 *) Malloc(Chunk::maxChunkSize * 3);
   for (int i = 0; i < n; ++i) {
     Chunk ck = g.currentImage.chunkInfo[i];
-    epf("Region xy=[%d,%d] wh=[%d,%d] fv=%d, pixCount=%d",
+    epf("Region xy=[%d,%d] wh=[%d,%d] fv=%d, pixCount=%d\n",
 	ck.x, ck.y, ck.w, ck.h,	ck.floodValue, ck.pixelCount);
     memset(pixels, 0xff, ck.w*ck.h*3); // Set pixels to all white
     for (int y = 0; y < ck.h; ++y) {
@@ -710,7 +708,7 @@ checkArgs(void)
 int
 main(int argc, char **argv)
 {
-  epf("Starting up.");
+  epf("Starting up.\n");
   doCommandLineArgs(&argc, &argv, &arg_tab[0], 0, 0, UsageString);
   checkArgs();
   g.imageWidth = ImageWidth;
@@ -736,9 +734,9 @@ main(int argc, char **argv)
   
   if (g.flags.threshold) {
     if (g.flags.chopup) {
-      epf("start flooding");
+      epf("start flooding\n");
       doFloodingUsingMask();
-      epf("end flooding");
+      epf("end flooding\n");
     }
   }
   if (g.flags.blockmatch) {
