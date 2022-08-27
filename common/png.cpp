@@ -1,10 +1,8 @@
-//
-//  png.c
-//
 
 #include <png.h>
+#include "png.hpp"
 
-static void
+void
 pngWriteRgbPixelsToFile(const char *filename, UInt8 *buf, UInt imgWidth, UInt imgHeight)
 {
   FILE *fp = fopen(filename, "wb");
@@ -38,6 +36,3 @@ pngWriteRgbPixelsToFile(const char *filename, UInt8 *buf, UInt imgWidth, UInt im
   png_destroy_write_struct(&png_ptr, (png_infopp)NULL);
   return;
 }
-
-// pngWriteRgbPixelsToFile(filename, &pngBuf[0][0], PngWidth, PngHeight, title);
-//TODO mabye

@@ -1,24 +1,6 @@
-typedef enum {
-  ARG_NULL = 0,
-  ARG_BOOL_SET,
-  ARG_BOOL_CLR,
-  ARG_STRING,
-  ARG_INT,
-  ARG_HEX,
-  ARG_FLOAT,
-  ARG_DOUBLE,
-  ARG_USAGE
-} arg_t;
+#include "do_args.hpp"
 
-struct args {
-  const char *arg;	// FIXME: have short/long form, eg:  -v --verbose
-  arg_t       type;
-  void        *flag;
-  const char *desc;
-};
-
-
-static void
+void
 do_usage(const struct args *ap, const char *usage)
 {
   epf("%s\n", usage);
@@ -29,7 +11,7 @@ do_usage(const struct args *ap, const char *usage)
   exit(1);
 }
 
-static void
+void
 doCommandLineArgs(SInt *argcp, char ***argvp, const struct args *ap, SInt32 minparams, SInt32 maxparams, const char *usage)
 {
   SInt32 argc = *argcp;

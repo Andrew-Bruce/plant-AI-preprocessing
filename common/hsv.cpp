@@ -1,19 +1,14 @@
-//
-//  hsv.cpp
-//
-
 #include <stdio.h>
+#include "hsv.hpp"
 
 
-static UInt32 hsv2rgb(UInt32 hsv) __attribute__ ((unused));
-static UInt32 rgb2hsv(UInt32 rgb) __attribute__ ((unused));
 
-static inline UInt32 R3(UInt8 a, UInt8 b, UInt8 c)
+inline UInt32 R3(UInt8 a, UInt8 b, UInt8 c)
 {
   return (a << 16) | (b << 8) | c;
 }
 
-static UInt32
+UInt32
 hsv2rgb(UInt8 hue, UInt8 sat, UInt8 v)
 {
   if (sat == 0) {
@@ -34,7 +29,7 @@ hsv2rgb(UInt8 hue, UInt8 sat, UInt8 v)
   }
 }
 
-static UInt32
+UInt32
 hsv2rgb(UInt32 hsv)
 {
   UInt8 hue = (hsv >> 16) & 0xff;
@@ -43,7 +38,7 @@ hsv2rgb(UInt32 hsv)
   return hsv2rgb(hue, sat, v);
 }
 
-static UInt32
+UInt32
 rgb2hsv(UInt8 red, UInt8 grn, UInt8 blu)
 {
   UInt8 rgbMin = (red < grn) ?
@@ -71,7 +66,7 @@ rgb2hsv(UInt8 red, UInt8 grn, UInt8 blu)
   return R3(hue, sat, val);
 }
 
-static UInt32
+UInt32
 rgb2hsv(UInt32 rgb)
 {
   UInt8 red = (rgb >> 16) & 0xff;

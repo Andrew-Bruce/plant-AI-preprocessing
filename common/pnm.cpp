@@ -1,8 +1,10 @@
-//
-//  pnm.cpp
-//
 
-static void
+#include "utils.hpp"
+#include "pnm.hpp"
+#include <unistd.h>
+#include <fcntl.h>
+
+void
 writePnmHeader(int fd, UInt width, UInt height)
 {
   char hdr[64];
@@ -10,14 +12,14 @@ writePnmHeader(int fd, UInt width, UInt height)
   write(fd, hdr, strlen(hdr));
 }
 
-static void
+void
 writePnmToStdout(UInt8* rgbPixels, UInt width, UInt height)
 {
   writePnmHeader(1, width, height);
   write(1, (char*)rgbPixels, width * height * 3);
 }
 
-static void
+void
 writePpmToFile(UInt8 *rgbPixels, UInt width, UInt height, const char *filename)
 {
   int fd = open(filename, O_WRONLY|O_CREAT|O_TRUNC, 0666);

@@ -7,7 +7,7 @@
 
 #include "common/utils.hpp"
 #include "imageProcessor.hpp"
-#include "common/hsv.cpp"
+#include "common/hsv.hpp"
 
 static const UInt BlockSize =  20;
 static const UInt VerticalSearchWindow = 30;

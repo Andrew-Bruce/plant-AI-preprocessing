@@ -11,20 +11,19 @@
 #include <algorithm>
 #include <cassert>
 #include <string>
-#include <jpeglib.h>
 #include <png.h>
 
 #include <cstdarg>
 #include <cstdio>
 
 #include "common/utils.hpp"
-#include "common/pnm.cpp"
-#include "common/do_args.cpp"
+#include "common/pnm.hpp"
+#include "common/do_args.hpp"
 
 
-#include "common/readJpeg.cpp"
-#include "common/png.cpp"
-#include "common/hsv.cpp"
+#include "common/jpeg.hpp"
+#include "common/png.hpp"
+#include "common/hsv.hpp"
 
 #include "chunk.hpp"
 
@@ -385,7 +384,7 @@ destroyBadChunks(){
 }
 
 void
-doFloodingUsingMask() {
+doFloodingUsingMask(){
   memset(g.currentImage.floodedMask, 0, sizeof(g.currentImage.floodedMask));
   epf("flooding idk\n");
   
