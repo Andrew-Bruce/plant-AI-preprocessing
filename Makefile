@@ -29,7 +29,7 @@ HSV_FILES		:= common/hsv.cpp common/hsv.hpp
 
 
 foo:	$(OBJECTS)
-	$(CC) $(CFLAGS) $(LIBS) $(OBJECTS) -o $(@) 
+	$(CC) $(CFLAGS) $(OBJECTS) $(LIBS) -o $(@) 
 
 
 main.o:			$(MAIN_FILES)
