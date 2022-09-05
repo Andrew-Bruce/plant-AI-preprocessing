@@ -13,8 +13,7 @@ OBJECTS += png.o
 OBJECTS += args.o
 OBJECTS += hsv.o
 
-LIBS	:= -ljpeg
-LIBS	+= -lpng
+LIBS	:= $(shell pkg-config --cflags --libs libjpeg libpng)
 
 MAIN_FILES		:= main.cpp common/utils.hpp common/pnm.hpp common/do_args.hpp common/jpeg.hpp common/png.cpp common/hsv.cpp imageProcessor.hpp
 IMAGE_PROCESSOR_FILES	:= imageProcessor.cpp imageProcessor.hpp common/utils.hpp common/hsv.cpp chunk.cpp
