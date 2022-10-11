@@ -47,12 +47,12 @@ andyAssert(int x, const char *s, const char *file, int line)
   return;
 }
 
-void *
-Malloc(size_t n)
+void*
+andyMalloc(size_t bytes)
 {
-  void *p = malloc(n);
+  void *p = malloc(bytes);
   if (p == NULL) {
-    fatal("Malloc(%d): %s\n", (int) n, syserr());
+    fatal("andyMalloc(%d): %s\n", (int)bytes, syserr());
   }
   return p;
 }
@@ -72,7 +72,7 @@ Readfile(const char * const fn, UInt32 *size)
     fatal("Cannot stat %s: %s\n", fn, syserr());
   }
   filesize = (size_t) statbuf.st_size;
-  data = (UInt8 *) Malloc(filesize);
+  data = (UInt8 *) andyMalloc(filesize);
   if (read(fd, data, (size_t) filesize) != (ssize_t) filesize) {
     fatal("read error, %s: %s\n", fn, syserr());
   }
@@ -82,3 +82,32 @@ Readfile(const char * const fn, UInt32 *size)
   }
   return data;
 }
+
+
+template <class T> T** make2DPointerArray(int width, int height){
+  T** row_pointers = (T**)andyMalloc(height*sizeof(T*));
+  for(int y=0; y<height; y++){
+    row_pointers[y] = (T*)andyMalloc(width*sizeof(T));
+  }
+  return row_pointers;
+}
+
+template <class T> void free2DPointerArray(T** row_pointers, int width, int height){
+  for(int y=0; y<height; y++){
+    free(row_pointers[y]);
+  }
+  free(row_pointers);
+}
+
+template unsigned char** make2DPointerArray<unsigned char>(int, int);
+template unsigned char*** make2DPointerArray<unsigned char*>(int, int);
+template bool** make2DPointerArray<bool>(int, int);
+template double** make2DPointerArray<double>(int, int);
+template int** make2DPointerArray<int>(int, int);
+
+template void free2DPointerArray<bool>(bool**, int, int);
+template void free2DPointerArray<double>(double**, int, int);
+template void free2DPointerArray<unsigned char>(unsigned char**, int, int);
+template void free2DPointerArray<unsigned char*>(unsigned char***, int, int);
+template void free2DPointerArray<int>(int **, int, int);
+

@@ -1,5 +1,7 @@
 #include "chunk.hpp"
 
+int Chunk::maxChunkSize = 0;
+
 Chunk::Chunk(void){
   
 }

@@ -33,8 +33,14 @@ void
 andyAssert(int x, const char *s, const char *file, int line);
 
 
-void * Malloc(size_t n);
+void * andyMalloc(size_t n);
 
 UInt8 *
 Readfile(const char * const fn, UInt32 *size)
   __attribute__ ((unused));
+
+
+
+
+template <class T> T** make2DPointerArray(int height, int width);
+template <class T> void free2DPointerArray(T** p, int height, int width);

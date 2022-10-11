@@ -1,26 +1,29 @@
 
 
-
-static const UInt ImageWidth  = 1023;
-static const UInt ImageHeight = 683;
-
-
-class image {
+class plantImage {
 public:
-  UInt8 hsvData[ImageHeight][ImageWidth][3];
-  UInt8 rgbData[ImageHeight][ImageWidth][3];
-  UInt8 tmpData[ImageHeight][ImageWidth][3];
-  bool mask[ImageHeight][ImageWidth];
-  int floodedMask[ImageHeight][ImageWidth];
+  UInt8** RGB_row_pointers;
+  UInt8** HSV_row_pointers;
+  
+  UInt8 ***hsvData;//[][][3]
+  UInt8 ***rgbData;//[][][3]
+  bool **mask;
+  int **floodedMask;
   std::vector<Chunk> chunkInfo;
   std::vector<Chunk> badChunkInfo;
 
-  double depthMapOffset[ImageHeight][ImageWidth];
-  double diffFromMean[ImageHeight][ImageWidth];
+  int width;
+  int height;
   
-  UInt8 blockMatchOutput[ImageHeight][ImageWidth][3];
-  double depthMap[ImageHeight][ImageWidth];
-  UInt8 matchesForPixel[ImageHeight][ImageWidth];
+
+  double **depthMapOffset;
+  double **diffFromMean;
+
+  UInt8 **blockMatchOutput_row_pointers;
+  UInt8 ***blockMatchOutputData;//[][][3]
+
+  double **depthMap;
+  UInt8 **matchesForPixel;
 
   
   void convertRgbImageToHsv(void);
@@ -59,7 +62,21 @@ public:
   void saveMapToFile(void);
   void getMapFromFile(void);
   void doBlockMatch(void);
+
+  void thresholdHSV(void);
+  void doFloodingUsingMask(void);
+  int hLineNumChunkPixles(int x, int y, int len, int chunkNum);
+  int vLineNumChunkPixels(int x, int y, int len, int chunkNum);
+  void splitChunkInHalf(int chunkIndex, bool horizontalSplit, int newFloodValue);
+  void floodFromThisPixel(int x, int y, int chunkNum);
+  void refloodFromThisPixelInRange(int x, int y, int x0, int y0, int x1, int y1, int oldFloodValue, int newFloodValue);
+  int refloodChunk(int chunkIndex, int startingNewFloodValue);
+  void calculateChunks(int numChunks);
+  int splitChunk(int chunkIndexToSplit, int startingNewChunkValue, bool horizontalSplit);
+  void drawChunkRectangles(void);
+  void destroyBadChunks(void);
+
   
-  image(void);
-  image(const char* filename, int* widthOutput, int* heightOutput);
+  plantImage(void);
+  plantImage(UInt8** RGB_row_pointers_, int width_, int height_);
 };
