@@ -5,6 +5,7 @@
 #include <vector>
 #include <math.h>
 #include <assert.h>
+#include <iostream>
 
 #include "chunk.hpp"
 
@@ -12,11 +13,11 @@
 #include "imageProcessor.hpp"
 #include "common/hsv.hpp"
 
-static const UInt BlockSize =  20;
-static const UInt VerticalSearchWindow = 30;
-static const UInt HorizontalSearchWindow = 30;
-static const UInt RightShift = 550;
-static const UInt DownShift =  48;
+static const uint32_t BlockSize =  20;
+static const uint32_t VerticalSearchWindow = 30;
+static const uint32_t HorizontalSearchWindow = 30;
+static const uint32_t RightShift = 550;
+static const uint32_t DownShift =  48;
 
 static const int MinPixelsWorthSaving = 1000;
 
@@ -24,7 +25,7 @@ plantImage::plantImage(void){
   
 }
 
-plantImage::plantImage(UInt8** RGB_row_pointers_, int width_, int height_)
+plantImage::plantImage(uint8_t** RGB_row_pointers_, int width_, int height_)
 {
   width = width_;
   height = height_;
@@ -32,29 +33,29 @@ plantImage::plantImage(UInt8** RGB_row_pointers_, int width_, int height_)
 
   const int numChannels = 3;
   
-  HSV_row_pointers = (UInt8**)make2DPointerArray<UInt8>(width*numChannels, height);
-  blockMatchOutput_row_pointers = (UInt8**)make2DPointerArray<UInt8>(width*numChannels, height);
+  HSV_row_pointers = (uint8_t**)make2DPointerArray<uint8_t>(width*numChannels, height);
+  blockMatchOutput_row_pointers = (uint8_t**)make2DPointerArray<uint8_t>(width*numChannels, height);
   
   printf("making new image w h = %d, %d\n", width, height);
   
   
 
   
-  rgbData = (UInt8***)make2DPointerArray<UInt8*>(width, height);
+  rgbData = (uint8_t***)make2DPointerArray<uint8_t*>(width, height);
   for(int y = 0; y < height; y++){
     for(int x = 0; x < width; x++){
       rgbData[y][x] = &(RGB_row_pointers_[y][x*numChannels]);
     }
   }
   
-  hsvData = (UInt8***)make2DPointerArray<UInt8*>(width, height);
+  hsvData = (uint8_t***)make2DPointerArray<uint8_t*>(width, height);
   for(int y = 0; y < height; y++){
     for(int x = 0; x < width; x++){
       hsvData[y][x] = &(HSV_row_pointers[y][x*numChannels]);
     }
   }
 
-  blockMatchOutputData = (UInt8***)make2DPointerArray<UInt8*>(width, height);
+  blockMatchOutputData = (uint8_t***)make2DPointerArray<uint8_t*>(width, height);
   for(int y = 0; y < height; y++){
     for(int x = 0; x < width; x++){
       blockMatchOutputData[y][x] = &(blockMatchOutput_row_pointers[y][x*numChannels]);
@@ -64,28 +65,26 @@ plantImage::plantImage(UInt8** RGB_row_pointers_, int width_, int height_)
   mask = (bool**)make2DPointerArray<bool>(width, height);
   floodedMask = (int**)make2DPointerArray<int>(width, height);
   
-
   depthMapOffset = (double**)make2DPointerArray<double>(width, height);
   diffFromMean = (double**)make2DPointerArray<double>(width, height);
 
   depthMap = (double**)make2DPointerArray<double>(width, height);
 
-  matchesForPixel = (UInt8**)make2DPointerArray<UInt8>(width, height);
-  
+  matchesForPixel = (uint8_t**)make2DPointerArray<uint8_t>(width, height);
 }
 
 void
 plantImage::convertRgbImageToHsv(void)
 {
-  for (UInt y = 0; y < height; ++y) {
-    for (UInt x = 0; x < width; ++x) {
-      UInt8 red = rgbData[y][x][0];
-      UInt8 grn = rgbData[y][x][1];
-      UInt8 blu = rgbData[y][x][2];
-      UInt32 hsv = rgb2hsv(red, grn, blu);
-      UInt8 hue = (hsv >> 16) & 0xff;
-      UInt8 sat = (hsv >>  8) & 0xff;
-      UInt8 val = (hsv >>  0) & 0xff;
+  for (uint32_t y = 0; y < height; ++y) {
+    for (uint32_t x = 0; x < width; ++x) {
+      uint8_t red = rgbData[y][x][0];
+      uint8_t grn = rgbData[y][x][1];
+      uint8_t blu = rgbData[y][x][2];
+      uint32_t hsv = rgb2hsv(red, grn, blu);
+      uint8_t hue = (hsv >> 16) & 0xff;
+      uint8_t sat = (hsv >>  8) & 0xff;
+      uint8_t val = (hsv >>  0) & 0xff;
       setHsvPixel(x, y, hue, sat, val);
     }
   }
@@ -94,15 +93,15 @@ plantImage::convertRgbImageToHsv(void)
 void
 plantImage::convertHsvImageToRgb(void)
 {
-  for (UInt y = 0; y < height; ++y) {
-    for (UInt x = 0; x < width; ++x) {
-      UInt8 hue = hsvData[y][x][0];
-      UInt8 sat = hsvData[y][x][1];
-      UInt8 val = hsvData[y][x][2];
-      UInt32 rgb = hsv2rgb(hue, sat, val);
-      UInt8 red = (rgb >> 16) & 0xff;
-      UInt8 grn = (rgb >>  8) & 0xff;
-      UInt8 blu = (rgb >>  0) & 0xff;
+  for (uint32_t y = 0; y < height; ++y) {
+    for (uint32_t x = 0; x < width; ++x) {
+      uint8_t hue = hsvData[y][x][0];
+      uint8_t sat = hsvData[y][x][1];
+      uint8_t val = hsvData[y][x][2];
+      uint32_t rgb = hsv2rgb(hue, sat, val);
+      uint8_t red = (rgb >> 16) & 0xff;
+      uint8_t grn = (rgb >>  8) & 0xff;
+      uint8_t blu = (rgb >>  0) & 0xff;
       setRgbPixel(x, y, red, grn, blu);
     }
   }
@@ -111,13 +110,13 @@ plantImage::convertHsvImageToRgb(void)
 
 
 void
-plantImage::getImageAverageSatVal(UInt *satP, UInt *valP, bool ignoreMask)
+plantImage::getImageAverageSatVal(uint32_t *satP, uint32_t *valP, bool ignoreMask)
 {
-  UInt32 valSum = 0;
-  UInt32 satSum = 0;
+  uint32_t valSum = 0;
+  uint32_t satSum = 0;
   int pixelCount = 0;
-  for (UInt y = 0; y < height; ++y) {
-    for (UInt x = 0; x < width; ++x) {
+  for (uint32_t y = 0; y < height; ++y) {
+    for (uint32_t x = 0; x < width; ++x) {
       if (mask[y][x] || ignoreMask){
 	pixelCount++;
 	satSum += hsvData[y][x][1];
@@ -131,21 +130,21 @@ plantImage::getImageAverageSatVal(UInt *satP, UInt *valP, bool ignoreMask)
 }
 
 void
-plantImage::getBlockAverageSatVal(int xx, int yy, UInt *satP, UInt *valP, UInt *pixelCountP, bool ignoreMask)
+plantImage::getBlockAverageSatVal(int xx, int yy, uint32_t *satP, uint32_t *valP, uint32_t *pixelCountP, bool ignoreMask)
 {
-  UInt NormHorizontalBlocks = 16;
-  UInt NormVerticalBlocks   = 16;
-  UInt NormXPixelsPerBlock = width / NormHorizontalBlocks;
-  UInt NormYPixelsPerBlock = height / NormVerticalBlocks;
+  uint32_t NormHorizontalBlocks = 16;
+  uint32_t NormVerticalBlocks   = 16;
+  uint32_t NormXPixelsPerBlock = width / NormHorizontalBlocks;
+  uint32_t NormYPixelsPerBlock = height / NormVerticalBlocks;
 
   
-  UInt valSum = 0;
-  UInt satSum = 0;
+  uint32_t valSum = 0;
+  uint32_t satSum = 0;
   int pixelCount = 0;
-  UInt xEnd = xx + NormXPixelsPerBlock;
-  UInt yEnd = yy + NormYPixelsPerBlock;
-  for (UInt y = yy; y < yEnd; ++y) {
-    for (UInt x = 0; x < xEnd; ++x) {
+  uint32_t xEnd = xx + NormXPixelsPerBlock;
+  uint32_t yEnd = yy + NormYPixelsPerBlock;
+  for (uint32_t y = yy; y < yEnd; ++y) {
+    for (uint32_t x = 0; x < xEnd; ++x) {
       if((x<width)&&(y<height)){
 	if (mask[y][x] || ignoreMask){
 	  pixelCount++;
@@ -166,27 +165,27 @@ plantImage::getBlockAverageSatVal(int xx, int yy, UInt *satP, UInt *valP, UInt *
 }
 
 void
-plantImage::normalizeBlock(UInt xx, UInt yy, UInt imgAvgSat, UInt imgAvgVal, UInt blkAvgSat, UInt blkAvgVal, bool doSat, bool doVal, bool ignoreMask)
+plantImage::normalizeBlock(uint32_t xx, uint32_t yy, uint32_t imgAvgSat, uint32_t imgAvgVal, uint32_t blkAvgSat, uint32_t blkAvgVal, bool doSat, bool doVal, bool ignoreMask)
 {
-  UInt NormHorizontalBlocks = 16;
-  UInt NormVerticalBlocks   = 16;
-  UInt NormXPixelsPerBlock = width / NormHorizontalBlocks;
-  UInt NormYPixelsPerBlock = height / NormVerticalBlocks;
+  uint32_t NormHorizontalBlocks = 16;
+  uint32_t NormVerticalBlocks   = 16;
+  uint32_t NormXPixelsPerBlock = width / NormHorizontalBlocks;
+  uint32_t NormYPixelsPerBlock = height / NormVerticalBlocks;
 
   
-  UInt xEnd = xx + NormXPixelsPerBlock;
-  UInt yEnd = yy + NormYPixelsPerBlock;
-  for (UInt y = yy; y < yEnd; y++) {
-    for (UInt x = xx; x < xEnd; x++) {
+  uint32_t xEnd = xx + NormXPixelsPerBlock;
+  uint32_t yEnd = yy + NormYPixelsPerBlock;
+  for (uint32_t y = yy; y < yEnd; y++) {
+    for (uint32_t x = xx; x < xEnd; x++) {
       if((x<width)&&(y<height)){
 	if (mask[y][x] || ignoreMask){
 	  if(doSat){
-	    UInt s = (hsvData[y][x][1] * imgAvgSat) / blkAvgSat;
+	    uint32_t s = (hsvData[y][x][1] * imgAvgSat) / blkAvgSat;
 	    hsvData[y][x][1] = s;
 	    s = (s > 255) ? 255 : s;
 	  }
 	  if(doVal){
-	    UInt v = (hsvData[y][x][2] * imgAvgVal) / blkAvgVal;
+	    uint32_t v = (hsvData[y][x][2] * imgAvgVal) / blkAvgVal;
 	    v = (v > 255) ? 255 : v;
 	    hsvData[y][x][2] = v;
 	  }
@@ -199,30 +198,30 @@ plantImage::normalizeBlock(UInt xx, UInt yy, UInt imgAvgSat, UInt imgAvgVal, UIn
 void
 plantImage::normalizeImage(bool doSat, bool doVal, bool ignoreMask)
 {
-  UInt NormHorizontalBlocks = 16;
-  UInt NormVerticalBlocks   = 16;
-  UInt NormXPixelsPerBlock = width / NormHorizontalBlocks;
-  UInt NormYPixelsPerBlock = height / NormVerticalBlocks;
+  uint32_t NormHorizontalBlocks = 16;
+  uint32_t NormVerticalBlocks   = 16;
+  uint32_t NormXPixelsPerBlock = width / NormHorizontalBlocks;
+  uint32_t NormYPixelsPerBlock = height / NormVerticalBlocks;
 
   
   
-  UInt imgAvgSat;
-  UInt imgAvgVal;
+  uint32_t imgAvgSat;
+  uint32_t imgAvgVal;
 
   getImageAverageSatVal(&imgAvgSat, &imgAvgVal, ignoreMask);
   Assert(imgAvgSat < 256);
   Assert(imgAvgVal < 256);
   
-  epf("image avg sat:%d val:%d\n", imgAvgSat, imgAvgVal);
+  std::cerr << "image avg sat:" << imgAvgSat << "val:" << imgAvgVal << std::endl; 
   
-  UInt dy = height / NormVerticalBlocks;
-  UInt dx = width  / NormHorizontalBlocks;
+  uint32_t dy = height / NormVerticalBlocks;
+  uint32_t dx = width  / NormHorizontalBlocks;
   
-  for (UInt y = 0; y < height; y += dy) {
-    for (UInt x = 0; x < width; x += dx) {
-      UInt blkAvgVal;
-      UInt blkAvgSat;
-      UInt pixelCount;
+  for (uint32_t y = 0; y < height; y += dy) {
+    for (uint32_t x = 0; x < width; x += dx) {
+      uint32_t blkAvgVal;
+      uint32_t blkAvgSat;
+      uint32_t pixelCount;
       getBlockAverageSatVal(x, y, &blkAvgSat, &blkAvgVal, &pixelCount, ignoreMask);
       if(pixelCount > 0){
 	normalizeBlock(x, y, imgAvgSat, imgAvgVal, blkAvgSat, blkAvgVal, doSat, doVal, ignoreMask);
@@ -238,7 +237,7 @@ plantImage::normalizeImage(bool doSat, bool doVal, bool ignoreMask)
 
 
 void
-plantImage::setRgbPixel(UInt x, UInt y, UInt8 red, UInt8 green, UInt8 blue)
+plantImage::setRgbPixel(uint32_t x, uint32_t y, uint8_t red, uint8_t green, uint8_t blue)
 {
   Assert(x < width);
   Assert(y < height);
@@ -251,7 +250,7 @@ plantImage::setRgbPixel(UInt x, UInt y, UInt8 red, UInt8 green, UInt8 blue)
 }
 
 void
-plantImage::setHsvPixel(UInt x, UInt y, UInt8 hue, UInt8 sat, UInt8 val)
+plantImage::setHsvPixel(uint32_t x, uint32_t y, uint8_t hue, uint8_t sat, uint8_t val)
 {
   hsvData[y][x][0] = hue;
   hsvData[y][x][1] = sat;
@@ -260,11 +259,11 @@ plantImage::setHsvPixel(UInt x, UInt y, UInt8 hue, UInt8 sat, UInt8 val)
 
 
 void
-plantImage::dLine(UInt x0, UInt y0, UInt x1, UInt y1, UInt c)
+plantImage::dLine(uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1, uint32_t c)
 {
-  UInt8 red = (c >> 16) & 0xff;
-  UInt8 grn = (c >>  8) & 0xff;
-  UInt8 blu = (c >>  0) & 0xff;
+  uint8_t red = (c >> 16) & 0xff;
+  uint8_t grn = (c >>  8) & 0xff;
+  uint8_t blu = (c >>  0) & 0xff;
 
   if (x0 > x1) {
     int tmp;
@@ -278,9 +277,9 @@ plantImage::dLine(UInt x0, UInt y0, UInt x1, UInt y1, UInt c)
   double slope;
   slope = ((double) y0 - y1);
   slope /= ((double) x0 - x1);
-  for(UInt i = 0; i < x1-x0; i++){
-    UInt xPix = x0 + i;
-    UInt yPix = (int)(y0+(slope*i));
+  for(uint32_t i = 0; i < x1-x0; i++){
+    uint32_t xPix = x0 + i;
+    uint32_t yPix = (int)(y0+(slope*i));
     setRgbPixel(xPix, yPix, red, grn, blu);
     setRgbPixel(xPix, yPix+1, red, grn, blu);
   }
@@ -288,31 +287,31 @@ plantImage::dLine(UInt x0, UInt y0, UInt x1, UInt y1, UInt c)
 }
 
 void
-plantImage::hLine(UInt x, UInt y, UInt len, UInt c)
+plantImage::hLine(uint32_t x, uint32_t y, uint32_t len, uint32_t c)
 {
-  UInt8 red = (c >> 16) & 0xff;
-  UInt8 grn = (c >>  8) & 0xff;
-  UInt8 blu = (c >>  0) & 0xff;
-  for (UInt i = 0; i < len; ++i) {
+  uint8_t red = (c >> 16) & 0xff;
+  uint8_t grn = (c >>  8) & 0xff;
+  uint8_t blu = (c >>  0) & 0xff;
+  for (uint32_t i = 0; i < len; ++i) {
     setRgbPixel(x+i, y+0, red, grn, blu);
     setRgbPixel(x+i, y+1, red, grn, blu);
   }
 }
 
 void
-plantImage::vLine(UInt32 x, UInt32 y, UInt32 len, UInt c)
+plantImage::vLine(uint32_t x, uint32_t y, uint32_t len, uint32_t c)
 {
-  UInt8 red = (c >> 16) & 0xff;
-  UInt8 grn = (c >>  8) & 0xff;
-  UInt8 blu = (c >>  0) & 0xff;
-  for (UInt32 i = 0; i < len; ++i) {
+  uint8_t red = (c >> 16) & 0xff;
+  uint8_t grn = (c >>  8) & 0xff;
+  uint8_t blu = (c >>  0) & 0xff;
+  for (uint32_t i = 0; i < len; ++i) {
     setRgbPixel(x,   y+i, red, grn, blu);
     setRgbPixel(x+1, y+i, red, grn, blu);
   }
 }
 
 void
-plantImage::drawBox(UInt x, UInt y, UInt bsz, UInt c)
+plantImage::drawBox(uint32_t x, uint32_t y, uint32_t bsz, uint32_t c)
 {
   hLine(x,     y,     bsz, c);
   hLine(x,     y+bsz, bsz, c);
@@ -321,18 +320,18 @@ plantImage::drawBox(UInt x, UInt y, UInt bsz, UInt c)
 }
 
 void
-plantImage::hLineHSV(UInt x, UInt y, UInt len, UInt hue)
+plantImage::hLineHSV(uint32_t x, uint32_t y, uint32_t len, uint32_t hue)
 {
-  for (UInt i = 0; i < len; ++i) {
+  for (uint32_t i = 0; i < len; ++i) {
     setHsvPixel(x+i, y+0, hue, 0xff, 0xff);
     setHsvPixel(x+i, y+1, hue, 0xff, 0xff);
   }
 }
 
 void
-plantImage::vLineHSV(UInt32 x, UInt32 y, UInt32 len, UInt hue)
+plantImage::vLineHSV(uint32_t x, uint32_t y, uint32_t len, uint32_t hue)
 {
-  for (UInt32 i = 0; i < len; ++i) {
+  for (uint32_t i = 0; i < len; ++i) {
     setHsvPixel(x,   y+i, hue, 0xff, 0xff);
     setHsvPixel(x+1, y+i, hue, 0xff, 0xff);
   }
@@ -340,7 +339,7 @@ plantImage::vLineHSV(UInt32 x, UInt32 y, UInt32 len, UInt hue)
 
 
 void
-plantImage::drawRectangleHSV(UInt x, UInt y, UInt dx, UInt dy, UInt hue)
+plantImage::drawRectangleHSV(uint32_t x, uint32_t y, uint32_t dx, uint32_t dy, uint32_t hue)
 {
   hLineHSV(x,     y,     dx, hue);
   hLineHSV(x,     y+dy, dx, hue);
@@ -371,21 +370,21 @@ std::vector<LineThing> listOfLines;
 
 
 double
-plantImage::getMatchScore(UInt x0, UInt y0, UInt x1, UInt y1)
+plantImage::getMatchScore(uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1)
 {
   
-  UInt32 score = 0;
+  uint32_t score = 0;
   
-  UInt testX0;
-  UInt testY0;
-  UInt testX1;
-  UInt testY1;
+  uint32_t testX0;
+  uint32_t testY0;
+  uint32_t testX1;
+  uint32_t testY1;
   
   int magenta = (0xff * 300) / 360;  
   
   int pixelsChecked = 0;
-  for (UInt dy = 0; dy < BlockSize; ++dy) {
-    for (UInt dx = 0; dx < BlockSize; ++dx) {
+  for (uint32_t dy = 0; dy < BlockSize; ++dy) {
+    for (uint32_t dx = 0; dx < BlockSize; ++dx) {
       testX0 = x0 + dx;
       testY0 = y0 + dy;
       testX1 = x1 + dx;
@@ -413,18 +412,18 @@ plantImage::getMatchScore(UInt x0, UInt y0, UInt x1, UInt y1)
 }
 
 void
-plantImage::matchBlockLeftToRight(UInt x0, UInt y0)
+plantImage::matchBlockLeftToRight(uint32_t x0, uint32_t y0)
 {
   double lowestScore = 10000001.0;
-  UInt32 x1 = x0;
-  UInt32 y1 = y0;
+  uint32_t x1 = x0;
+  uint32_t y1 = y0;
   int triedBlocks = 0;
   //Assert(getMatchScore(x0, y0, x0, y0) == 0);
-  for (UInt j = 0; j < VerticalSearchWindow; ++j) {
-    UInt32 y = y0 + j + DownShift;
-    for (UInt i = 0; i < HorizontalSearchWindow; ++i) {
-      UInt32 x = x0 + i + RightShift;
-      UInt32 score = getMatchScore(x0, y0, x, y);
+  for (uint32_t j = 0; j < VerticalSearchWindow; ++j) {
+    uint32_t y = y0 + j + DownShift;
+    for (uint32_t i = 0; i < HorizontalSearchWindow; ++i) {
+      uint32_t x = x0 + i + RightShift;
+      uint32_t score = getMatchScore(x0, y0, x, y);
       triedBlocks++;
       if (score < lowestScore) {
 	lowestScore = score;
@@ -452,18 +451,18 @@ plantImage::matchBlockLeftToRight(UInt x0, UInt y0)
   }
 }
 
-void plantImage::matchBlockRightToLeft(UInt x0, UInt y0)
+void plantImage::matchBlockRightToLeft(uint32_t x0, uint32_t y0)
 {
   double lowestScore = 10000001.0;
-  UInt32 x1 = x0;
-  UInt32 y1 = y0;
+  uint32_t x1 = x0;
+  uint32_t y1 = y0;
   int triedBlocks = 0;
   //Assert(getMatchScore(x0, y0, x0, y0) == 0);
-  for (UInt j = 0; j < VerticalSearchWindow; ++j) {
-    UInt32 y = y0 - j - DownShift;
-    for (UInt i = 0; i < HorizontalSearchWindow; ++i) {
-      UInt32 x = x0 - i - RightShift;
-      UInt32 score = getMatchScore(x0, y0, x, y);
+  for (uint32_t j = 0; j < VerticalSearchWindow; ++j) {
+    uint32_t y = y0 - j - DownShift;
+    for (uint32_t i = 0; i < HorizontalSearchWindow; ++i) {
+      uint32_t x = x0 - i - RightShift;
+      uint32_t score = getMatchScore(x0, y0, x, y);
       triedBlocks++;
       if (score < lowestScore) {
 	lowestScore = score;
@@ -494,7 +493,6 @@ plantImage::saveMapToFile(void){
   int poop;
   const char *fn = "depthThing.dat";
   poop = open(fn, O_WRONLY|O_CREAT|O_TRUNC, 0666);
-  epf("poop=%d\n", poop);
   if (poop < 0) {
     fatal("Open failed, %s: %s\n", fn, syserr());
   }
@@ -512,7 +510,6 @@ plantImage::getMapFromFile(void){
   int poop;
   const char *fn = "depthThindat";
   poop = open(fn, O_RDONLY);
-  epf("poop=%d\n", poop);
   if (poop < 0) {
     fatal("Open failed, %s: %s", fn, syserr());
   }
@@ -532,23 +529,23 @@ plantImage::doBlockMatch(void)
   bool readFile = false;
   int matchedBlocks = 0;
   
-  for (UInt y = 0; y < height; y += 5) {
-    for (UInt x = 0; x < width/2; x += 5) {
+  for (uint32_t y = 0; y < height; y += 5) {
+    for (uint32_t x = 0; x < width/2; x += 5) {
       matchBlockLeftToRight(x, y);
       matchedBlocks++;
     }
-    epf("y = %d\n", y);
+    std::cerr << "y = " << y << std::endl;
   }
-  epf("other thing");
-  for (UInt y = 0; y < height; y += 5) {
-    for (UInt x = width/2; x < width; x += 5) {
+  std::cerr << "other thing" << std::endl;
+  for (uint32_t y = 0; y < height; y += 5) {
+    for (uint32_t x = width/2; x < width; x += 5) {
       matchBlockRightToLeft(x, y);
       matchedBlocks++;
     }
-    epf("y = %d\n", y);
+    std::cerr << "y = " << y <<std::endl;
   }
   
-  epf("mathed %d blocks\n", matchedBlocks);
+  std::cerr << "mathed " << matchedBlocks << " blocks" << std::endl;
 
   
   /*
@@ -622,7 +619,7 @@ plantImage::doBlockMatch(void)
 	val -= meanDepthLen;
 	val *= -1;
 	val *= 40;
-	epf("val = %f", val);
+	std::cerr << "val = " << val << std::endl;
 	if(val > 0){
 	  if(val > 255){
 	    val = 255;
@@ -643,7 +640,7 @@ plantImage::doBlockMatch(void)
       }
     }
   }
-  epf("depth map generated");
+  std::cerr << "depth map generated" << std::endl;
 }
 
 
@@ -869,7 +866,7 @@ plantImage::calculateChunks(int numChunks) {
       }
     }
     if(!(numPix > 0)){
-      epf("chunk value %d has no pixels\n", chunk);
+      std::cerr << "chunk value " << chunk << " has no pixels\n";
       assert(false);
     }
     int w = maxX-minX+1;
@@ -942,8 +939,8 @@ plantImage::doFloodingUsingMask(){
   }
   
   int chunkID = 1;
-  for (UInt y = 0; y < height; y++) {
-    for (UInt x = 0; x < width; x++) {
+  for (uint32_t y = 0; y < height; y++) {
+    for (uint32_t x = 0; x < width; x++) {
       if ((floodedMask[y][x] == 0)&&(mask[y][x] == true)){
 	floodFromThisPixel(x, y, chunkID);
 	chunkID++;
@@ -985,8 +982,8 @@ plantImage::doFloodingUsingMask(){
     int thing10  = (0xff * 270) / 360;
     int colorIndex[] = {thing1, thing2, thing3, thing4, thing5, thing6, thing7, thing8, thing9, thing10};
   
-    for (UInt y = 0; y < height; y++) {
-      for (UInt x = 0; x < width; x++) {
+    for (uint32_t y = 0; y < height; y++) {
+      for (uint32_t x = 0; x < width; x++) {
 	if(floodedMask[y][x] != 0) {
 	  hsvData[y][x][0] = colorIndex[floodedMask[y][x]%(sizeof(colorIndex)/sizeof(colorIndex[0]))];
 	  hsvData[y][x][1] = 0xff;
@@ -1016,8 +1013,8 @@ plantImage::thresholdHSV(void)
     memset(mask[y], true, width*sizeof(bool));
   }
 
-  for (UInt y = 0; y < height; ++y) {
-    for (UInt x = 0; x < width; ++x) {
+  for (uint32_t y = 0; y < height; ++y) {
+    for (uint32_t x = 0; x < width; ++x) {
       int hue = hsvData[y][x][0];
       int sat = hsvData[y][x][1];
       int val = hsvData[y][x][2];
@@ -1050,8 +1047,8 @@ plantImage::thresholdHSV(void)
       }
     }
   }
-  for (UInt y = 0; y < height; ++y) {
-    for (UInt x = 0; x < width; ++x) {
+  for (uint32_t y = 0; y < height; ++y) {
+    for (uint32_t x = 0; x < width; ++x) {
       int hue = hsvData[y][x][0];
       // int sat = hsvData[y][x][1];
       int val = hsvData[y][x][2];
@@ -1080,8 +1077,8 @@ plantImage::thresholdHSV(void)
   for (int i = 0; i < 300; i++) {
     bool tempMask[this->height][this->width];
     memcpy(tempMask, mask, sizeof(tempMask));
-    for (UInt y = 0; y < height; y++) {
-      for (UInt x = 0; x < width; x++) {
+    for (uint32_t y = 0; y < height; y++) {
+      for (uint32_t x = 0; x < width; x++) {
 	if (!mask[y][x]) {
 	  int adjacentCount = 0;
 	  for (int dy = -1; dy <= 1; dy++) {
@@ -1114,8 +1111,8 @@ plantImage::thresholdHSV(void)
 
 
   int numPixlesMasked = 0;
-  for (UInt y = 0; y < height; ++y) {
-    for (UInt x = 0; x < width; ++x) {
+  for (uint32_t y = 0; y < height; ++y) {
+    for (uint32_t x = 0; x < width; ++x) {
       if (!mask[y][x]) {
 	numPixlesMasked++;
 	hsvData[y][x][0] = magenta;

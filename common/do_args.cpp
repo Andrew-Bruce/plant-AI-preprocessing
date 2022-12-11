@@ -12,12 +12,12 @@ do_usage(const struct args *ap, const char *usage)
 }
 
 void
-doCommandLineArgs(SInt *argcp, char ***argvp, const struct args *ap, SInt32 minparams, SInt32 maxparams, const char *usage)
+doCommandLineArgs(int32_t *argcp, char ***argvp, const struct args *ap, int32_t minparams, int32_t maxparams, const char *usage)
 {
-  SInt32 argc = *argcp;
+  int32_t argc = *argcp;
   char  **argv = *argvp;
   while (argc > 1 && argv[1][0] == '-') {
-    for (UInt32 i = 0; ; ++i) {
+    for (uint32_t i = 0; ; ++i) {
       if (ap[i].arg == NULL) {
         epf("Bad flag: %s\n", argv[1]);
         do_usage(ap, usage);
@@ -41,9 +41,9 @@ doCommandLineArgs(SInt *argcp, char ***argvp, const struct args *ap, SInt32 minp
 	    *(char **) ap[i].flag = argv[2];
 	  } else {
 	    if (t == ARG_HEX) {
-	      * (UInt32 *) ap[i].flag = strtol(argv[2], &endptr, 16);
+	      * (uint32_t *) ap[i].flag = strtol(argv[2], &endptr, 16);
 	    } else if (t == ARG_INT) {
-	      * (SInt32 *) ap[i].flag = strtol(argv[2], &endptr,  0);
+	      * (int32_t *) ap[i].flag = strtol(argv[2], &endptr,  0);
 	    } else if (t == ARG_FLOAT) {
 	      * (float *) ap[i].flag = strtod(argv[2], &endptr);
 	    } else if (t == ARG_DOUBLE) {

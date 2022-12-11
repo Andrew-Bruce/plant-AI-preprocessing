@@ -1,7 +1,7 @@
 CC	:= g++
 
-CFLAGS	:= -O3
-CFLAGS	+= -Wall -Wextra
+CFLAGS	:= -Ofast
+CFLAGS	+= -Wall -Wextra -Wpedantic -Wshadow -std=c++17
 
 OBJECTS := main.o
 OBJECTS += imageProcessor.o
@@ -29,7 +29,6 @@ HSV_FILES		:= common/hsv.cpp common/hsv.hpp
 
 foo:	$(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) $(LIBS) -o $(@) 
-
 
 main.o:			$(MAIN_FILES)
 	$(CC) -c $< -o $(@)

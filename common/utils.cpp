@@ -3,7 +3,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-__inline__ UInt min(UInt a, UInt b) { return (a < b) ? a : b; }
+__inline__ uint32_t min(uint32_t a, uint32_t b) { return (a < b) ? a : b; }
 
 void
 fatal(const char * const fmt, ...)
@@ -32,6 +32,7 @@ epf(const char * const fmt, ...)
 }
 
 
+
 const char *
 syserr(void)
 {
@@ -57,13 +58,13 @@ andyMalloc(size_t bytes)
   return p;
 }
 
-UInt8 *
-Readfile(const char * const fn, UInt32 *size)
+uint8_t *
+Readfile(const char * const fn, uint32_t *size)
 {
   struct stat statbuf;
-  UInt32 filesize;
-  UInt8 *data;
-  SInt32 fd;
+  uint32_t filesize;
+  uint8_t *data;
+  int32_t fd;
 
   if ((fd = open(fn, O_RDONLY)) < 0) {
     fatal("Readfile: Cannot open %s: %s\n", fn, syserr());
@@ -72,7 +73,7 @@ Readfile(const char * const fn, UInt32 *size)
     fatal("Cannot stat %s: %s\n", fn, syserr());
   }
   filesize = (size_t) statbuf.st_size;
-  data = (UInt8 *) andyMalloc(filesize);
+  data = (uint8_t *) andyMalloc(filesize);
   if (read(fd, data, (size_t) filesize) != (ssize_t) filesize) {
     fatal("read error, %s: %s\n", fn, syserr());
   }
@@ -81,6 +82,32 @@ Readfile(const char * const fn, UInt32 *size)
     *size = filesize;
   }
   return data;
+}
+
+
+std::vector<std::string>
+getListOfFiles(const char *s)
+{
+  std::vector<std::string> names;
+  struct dirent *dp;
+  DIR *dirp = opendir(s);
+  if (dirp == NULL) {
+    fatal("Can't open %s: %s", s, syserr());
+  }
+  chdir(s);
+  while ((dp = readdir(dirp)) != NULL) {
+    std::string nm = std::string(dp->d_name);
+    if (nm[0] == '.') {
+      continue;
+    }
+    Assert(dp->d_type == DT_REG);
+    names.push_back(nm);
+    
+  }
+  std::sort(names.begin(), names.end());
+  chdir("..");
+  closedir(dirp);
+  return names;
 }
 
 
@@ -110,4 +137,5 @@ template void free2DPointerArray<double>(double**, int, int);
 template void free2DPointerArray<unsigned char>(unsigned char**, int, int);
 template void free2DPointerArray<unsigned char*>(unsigned char***, int, int);
 template void free2DPointerArray<int>(int **, int, int);
+
 

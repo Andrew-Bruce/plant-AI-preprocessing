@@ -5,7 +5,7 @@
 #include <fcntl.h>
 
 void
-writePnmHeader(int fd, UInt width, UInt height)
+writePnmHeader(int fd, uint32_t width, uint32_t height)
 {
   char hdr[64];
   sprintf(hdr, "P6\n%d %d\n255\n", width, height);
@@ -13,14 +13,14 @@ writePnmHeader(int fd, UInt width, UInt height)
 }
 
 void
-writePnmToStdout(UInt8* rgbPixels, UInt width, UInt height)
+writePnmToStdout(uint8_t* rgbPixels, uint32_t width, uint32_t height)
 {
   writePnmHeader(1, width, height);
   write(1, (char*)rgbPixels, width * height * 3);
 }
 
 void
-writePpmToFile(UInt8 *rgbPixels, UInt width, UInt height, const char *filename)
+writePpmToFile(uint8_t *rgbPixels, uint32_t width, uint32_t height, const char *filename)
 {
   int fd = open(filename, O_WRONLY|O_CREAT|O_TRUNC, 0666);
   if (fd < 0) {

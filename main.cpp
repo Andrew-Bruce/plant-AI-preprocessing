@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <cstdio>
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
@@ -7,13 +7,12 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <vector>
-#include <dirent.h>
-#include <algorithm>
 #include <cassert>
 #include <string>
-
 #include <cstdarg>
-#include <cstdio>
+
+#include <iostream>
+
 
 #include "common/utils.hpp"
 #include "common/pnm.hpp"
@@ -28,26 +27,12 @@
 
 #include "imageProcessor.hpp"
 
-
-
-#define printf dont_use_printf_use_epf
-
-
-
 static const char ImageFile[] = "images/plant4.jpg";
-
-
-
-
-
-
-
-
 
 class Globals {
 public:
-  UInt imageWidth;
-  UInt imageHeight;
+  uint32_t imageWidth;
+  uint32_t imageHeight;
   struct {
     bool chopup;
     bool savefr;
@@ -88,45 +73,12 @@ static const struct args arg_tab[] = {
   { 0,             ARG_NULL,       0,                   0                                         },
 };
 
-
-
-
-
-
-std::vector<std::string>
-getListOfFiles(const char *s)
-{
-  std::vector<std::string> names;
-  struct dirent *dp;
-  DIR *dirp = opendir(s);
-  if (dirp == NULL) {
-    fatal("Can't open %s: %s", s, syserr());
-  }
-  chdir(s);
-  while ((dp = readdir(dirp)) != NULL) {
-    std::string nm = std::string(dp->d_name);
-    if (nm[0] == '.') {
-      continue;
-    }
-    Assert(dp->d_type == DT_REG);
-    names.push_back(nm);
-    
-  }
-  std::sort(names.begin(), names.end());
-  /*for (int i = 0; i < (int) names.size(); ++i) {
-    epf("%s\n", names[i].c_str());
-    }*/
-  chdir("..");
-  closedir(dirp);
-  return names;
-}
-
 void
 saveThresholdedImage(void)
 {
   //writePng("chunks/outputThing.png", g.currentImage.RGB_row_pointers, g.currentImage.width, g.currentImage.height, 8, 2);
   writeJpeg("chunks/outputThing.png", g.currentImage.RGB_row_pointers, g.currentImage.width, g.currentImage.height);
-  epf("image saved\n");
+  std::cerr << "image saved\n";
 }
 
 int
@@ -159,17 +111,20 @@ saveChunk(Chunk* chunk, int fileNumber){
   
   char filename[256];
 
-  UInt8** pixels = make2DPointerArray<UInt8>((chunk->w)*3, chunk->h);
+  uint8_t** pixels = make2DPointerArray<uint8_t>((chunk->w)*3, chunk->h);
   for(int y = 0; y < chunk->h; y++){
-    memset(pixels[y], 0xff, chunk->w*3*sizeof(UInt8));
+    memset(pixels[y], 0xff, chunk->w*3*sizeof(uint8_t));
   }
-  epf("Saving region xy=[%d,%d] wh=[%d,%d] fv=%d, pixCount=%d\n", chunk->x, chunk->y, chunk->w, chunk->h, chunk->floodValue, chunk->pixelCount);
+  
+  std::cout << "Saving region xy=[" << chunk->x << ", " << chunk->y << "] wh=[" << chunk->w << ", " << chunk->h << "] fv=" << chunk->floodValue << ", pixCount=" << chunk->pixelCount << std::endl;
+
+
   for (int y = 0; y < chunk->h; ++y) {
     for (int x = 0; x < chunk->w; ++x) {
       if (g.currentImage.floodedMask[y+chunk->y][x+chunk->x] == chunk->floodValue) {
-	//UInt8 *p = &pixels[(y*chunk->w + x) * 3];
-	UInt8 *p = &pixels[y][x*3];
-	UInt8 *t = &g.currentImage.rgbData[y+chunk->y][x+chunk->x][0];
+	//uint8_t *p = &pixels[(y*chunk->w + x) * 3];
+	uint8_t *p = &pixels[y][x*3];
+	uint8_t *t = &g.currentImage.rgbData[y+chunk->y][x+chunk->x][0];
 	*p++ = *t++;
 	*p++ = *t++;
 	*p++ = *t++;
@@ -183,13 +138,13 @@ saveChunk(Chunk* chunk, int fileNumber){
 
   if(saveDepthToo){
     for(int y = 0; y < chunk->h; y++){
-      memset(pixels[y], 0xff, chunk->w*3*sizeof(UInt8));
+      memset(pixels[y], 0xff, chunk->w*3*sizeof(uint8_t));
     }
     for (int y = 0; y < chunk->h; ++y) {
       for (int x = 0; x < chunk->w; ++x) {
 	if (g.currentImage.floodedMask[y+chunk->y][x+chunk->x] == chunk->floodValue) {
-	  UInt8 *p = &pixels[y][x*3];
-	  UInt8 *t = &g.currentImage.blockMatchOutputData[y+chunk->y][x+chunk->x][0];
+	  uint8_t *p = &pixels[y][x*3];
+	  uint8_t *t = &g.currentImage.blockMatchOutputData[y+chunk->y][x+chunk->x][0];
 	  *p++ = *t++;
 	  *p++ = *t++;
 	  *p++ = *t++;
@@ -199,23 +154,19 @@ saveChunk(Chunk* chunk, int fileNumber){
     sprintf(filename, "chunks/img_depth%05d.png", fileNumber);
     writePng(filename, pixels, chunk->w, chunk->h, 8, 2);
   }
-  free2DPointerArray<UInt8>(pixels, chunk->w*3, chunk->h);
+  free2DPointerArray<uint8_t>(pixels, chunk->w*3, chunk->h);
 }
 
 void
 saveFloodedRegions(void)
 {
-  
   int n = g.currentImage.chunkInfo.size();
-  epf("Saving %d flooded regions\n", n);
+  std::cerr << "Saving" << n << "flooded regions" << std::endl;
   
   int startingNum = getLastNumber();
   for (int i = 0; i < n; ++i) {
     saveChunk(&g.currentImage.chunkInfo[i], startingNum+i);
   }
-  
-  
-  
 }
 
 
@@ -246,19 +197,11 @@ checkArgs(void)
 int
 main(int argc, char **argv)
 {
-
-  
-
-  
-    
-  
-  epf("Starting up.\n");
+  std::cerr << "Starting up." << std::endl;
   doCommandLineArgs(&argc, &argv, &arg_tab[0], 0, 0, UsageString);
   checkArgs();
 
-
-  
-  UInt8** row_pointers = readJpeg(ImageFile, &g.imageWidth, &g.imageHeight);
+  uint8_t** row_pointers = readJpeg(ImageFile, &g.imageWidth, &g.imageHeight);
 
   g.currentImage = plantImage(row_pointers, g.imageWidth, g.imageHeight);
   g.currentImage.convertRgbImageToHsv();
@@ -281,9 +224,9 @@ main(int argc, char **argv)
   }
   if (g.flags.threshold) {
     if (g.flags.chopup) {
-      epf("start flooding\n");
+      std::cerr << "start flooding" << std::endl;
       g.currentImage.doFloodingUsingMask();
-      epf("end flooding\n");
+      std::cerr << "end flooding" << std::endl;
     }
   }
   if (g.flags.blockmatch) {
@@ -299,7 +242,7 @@ main(int argc, char **argv)
     saveThresholdedImage();
   }
   
-  epf("done and stuff\n");
+  std::cerr << "done and stuff" << std::endl;
   return 0;
   
 }

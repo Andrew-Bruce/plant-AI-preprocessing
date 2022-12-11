@@ -1,5 +1,5 @@
-void writePnmHeader(int fd, UInt width, UInt height);
+void writePnmHeader(int fd, uint32_t width, uint32_t height);
 
-void writePnmToStdout(UInt8* rgbPixels, UInt width, UInt height);
+void writePnmToStdout(uint8_t* rgbPixels, uint32_t width, uint32_t height);
 
-void writePpmToFile(UInt8 *rgbPixels, UInt width, UInt height, const char *filename);
+void writePpmToFile(uint8_t *rgbPixels, uint32_t width, uint32_t height, const char *filename);

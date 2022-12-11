@@ -3,22 +3,22 @@
 
 
 
-inline UInt32 R3(UInt8 a, UInt8 b, UInt8 c)
+inline uint32_t R3(uint8_t a, uint8_t b, uint8_t c)
 {
   return (a << 16) | (b << 8) | c;
 }
 
-UInt32
-hsv2rgb(UInt8 hue, UInt8 sat, UInt8 v)
+uint32_t
+hsv2rgb(uint8_t hue, uint8_t sat, uint8_t v)
 {
   if (sat == 0) {
     return R3(v, v, v);
   }
-  UInt8 region = hue / 43;
-  UInt8 remainder = (hue - (region * 43)) * 6;
-  UInt8 p = (v * (255 - sat)) >> 8;
-  UInt8 q = (v * (255 - ((sat * remainder) >> 8))) >> 8;
-  UInt8 t = (v * (255 - ((sat * (255 - remainder)) >> 8))) >> 8;
+  uint8_t region = hue / 43;
+  uint8_t remainder = (hue - (region * 43)) * 6;
+  uint8_t p = (v * (255 - sat)) >> 8;
+  uint8_t q = (v * (255 - ((sat * remainder) >> 8))) >> 8;
+  uint8_t t = (v * (255 - ((sat * (255 - remainder)) >> 8))) >> 8;
   switch (region) {
   case 0: return R3(v, t, p);
   case 1: return R3(q, v, p);
@@ -29,30 +29,30 @@ hsv2rgb(UInt8 hue, UInt8 sat, UInt8 v)
   }
 }
 
-UInt32
-hsv2rgb(UInt32 hsv)
+uint32_t
+hsv2rgb(uint32_t hsv)
 {
-  UInt8 hue = (hsv >> 16) & 0xff;
-  UInt8 sat = (hsv >>  8) & 0xff;
-  UInt8 v   = (hsv >>  0) & 0xff;
+  uint8_t hue = (hsv >> 16) & 0xff;
+  uint8_t sat = (hsv >>  8) & 0xff;
+  uint8_t v   = (hsv >>  0) & 0xff;
   return hsv2rgb(hue, sat, v);
 }
 
-UInt32
-rgb2hsv(UInt8 red, UInt8 grn, UInt8 blu)
+uint32_t
+rgb2hsv(uint8_t red, uint8_t grn, uint8_t blu)
 {
-  UInt8 rgbMin = (red < grn) ?
+  uint8_t rgbMin = (red < grn) ?
     (red < blu ? red : blu) :
     (grn < blu ? grn : blu);
-  UInt8 rgbMax = (red > grn) ?
+  uint8_t rgbMax = (red > grn) ?
     (red > blu ? red : blu) :
     (grn > blu ? grn : blu);
-  UInt8 hue = 0;
-  UInt8 val = rgbMax;
+  uint8_t hue = 0;
+  uint8_t val = rgbMax;
   if (val == 0) {
     return 0;
   }
-  UInt8 sat = 255 * long(rgbMax - rgbMin) / val;
+  uint8_t sat = 255 * long(rgbMax - rgbMin) / val;
   if (sat == 0) {
     return R3(hue, sat, val);
   }
@@ -66,11 +66,11 @@ rgb2hsv(UInt8 red, UInt8 grn, UInt8 blu)
   return R3(hue, sat, val);
 }
 
-UInt32
-rgb2hsv(UInt32 rgb)
+uint32_t
+rgb2hsv(uint32_t rgb)
 {
-  UInt8 red = (rgb >> 16) & 0xff;
-  UInt8 grn = (rgb >>  8) & 0xff;
-  UInt8 blu = (rgb >>  0) & 0xff;
+  uint8_t red = (rgb >> 16) & 0xff;
+  uint8_t grn = (rgb >>  8) & 0xff;
+  uint8_t blu = (rgb >>  0) & 0xff;
   return rgb2hsv(red, grn, blu);
 }

@@ -1,12 +1,11 @@
 
-
 class plantImage {
 public:
-  UInt8** RGB_row_pointers;
-  UInt8** HSV_row_pointers;
+  uint8_t** RGB_row_pointers;
+  uint8_t** HSV_row_pointers;
   
-  UInt8 ***hsvData;//[][][3]
-  UInt8 ***rgbData;//[][][3]
+  uint8_t ***hsvData;//[][][3]
+  uint8_t ***rgbData;//[][][3]
   bool **mask;
   int **floodedMask;
   std::vector<Chunk> chunkInfo;
@@ -19,11 +18,11 @@ public:
   double **depthMapOffset;
   double **diffFromMean;
 
-  UInt8 **blockMatchOutput_row_pointers;
-  UInt8 ***blockMatchOutputData;//[][][3]
+  uint8_t **blockMatchOutput_row_pointers;
+  uint8_t ***blockMatchOutputData;//[][][3]
 
   double **depthMap;
-  UInt8 **matchesForPixel;
+  uint8_t **matchesForPixel;
 
   
   void convertRgbImageToHsv(void);
@@ -32,33 +31,33 @@ public:
 
   
   void normalizeImage(bool doSat, bool doVal, bool ignoreMask);
-  void normalizeBlock(UInt xx, UInt yy, UInt imgAvgSat, UInt imgAvgVal, UInt blkAvgSat, UInt blkAvgVal, bool doSat, bool doVal, bool ignoreMask);
+  void normalizeBlock(uint32_t xx, uint32_t yy, uint32_t imgAvgSat, uint32_t imgAvgVal, uint32_t blkAvgSat, uint32_t blkAvgVal, bool doSat, bool doVal, bool ignoreMask);
 
-  void getBlockAverageSatVal(int xx, int yy, UInt *satP, UInt *valP, UInt *pixelCountP, bool ignoreMask);
+  void getBlockAverageSatVal(int xx, int yy, uint32_t *satP, uint32_t *valP, uint32_t *pixelCountP, bool ignoreMask);
 
-  void getImageAverageSatVal(UInt *satP, UInt *valP, bool ignoreMask);
+  void getImageAverageSatVal(uint32_t *satP, uint32_t *valP, bool ignoreMask);
 
 
 
-  void drawBox(UInt x, UInt y, UInt bsz, UInt c)  __attribute__((unused));
+  void drawBox(uint32_t x, uint32_t y, uint32_t bsz, uint32_t c)  __attribute__((unused));
   
-  void dLine(UInt x0, UInt y0, UInt x1, UInt y1, UInt c);
-  void hLine(UInt x, UInt y, UInt len, UInt c);
-  void vLine(UInt32 x, UInt32 y, UInt32 len, UInt c);
+  void dLine(uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1, uint32_t c);
+  void hLine(uint32_t x, uint32_t y, uint32_t len, uint32_t c);
+  void vLine(uint32_t x, uint32_t y, uint32_t len, uint32_t c);
 
-  void hLineHSV(UInt x, UInt y, UInt len, UInt hue);
-  void vLineHSV(UInt32 x, UInt32 y, UInt32 len, UInt hue);
+  void hLineHSV(uint32_t x, uint32_t y, uint32_t len, uint32_t hue);
+  void vLineHSV(uint32_t x, uint32_t y, uint32_t len, uint32_t hue);
 
-  void drawRectangleHSV(UInt x, UInt y, UInt dx, UInt dy, UInt hue) __attribute__((unused));
+  void drawRectangleHSV(uint32_t x, uint32_t y, uint32_t dx, uint32_t dy, uint32_t hue) __attribute__((unused));
 
   
-  void setHsvPixel(UInt x, UInt y, UInt8 hue, UInt8 sat, UInt8 val);
-  void setRgbPixel(UInt x, UInt y, UInt8 red, UInt8 green, UInt8 blue);
+  void setHsvPixel(uint32_t x, uint32_t y, uint8_t hue, uint8_t sat, uint8_t val);
+  void setRgbPixel(uint32_t x, uint32_t y, uint8_t red, uint8_t green, uint8_t blue);
 
 
-  double getMatchScore(UInt x0, UInt y0, UInt x1, UInt y1);
-  void matchBlockLeftToRight(UInt x0, UInt y0);
-  void matchBlockRightToLeft(UInt x0, UInt y0);
+  double getMatchScore(uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1);
+  void matchBlockLeftToRight(uint32_t x0, uint32_t y0);
+  void matchBlockRightToLeft(uint32_t x0, uint32_t y0);
   void saveMapToFile(void);
   void getMapFromFile(void);
   void doBlockMatch(void);
@@ -78,5 +77,5 @@ public:
 
   
   plantImage(void);
-  plantImage(UInt8** RGB_row_pointers_, int width_, int height_);
+  plantImage(uint8_t** RGB_row_pointers_, int width_, int height_);
 };

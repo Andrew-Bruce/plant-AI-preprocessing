@@ -1,4 +1,3 @@
-
 #include <assert.h>
 #include <stdio.h>
 #include <jpeglib.h>
@@ -6,7 +5,7 @@
 #include "utils.hpp"
 
 unsigned char**
-readJpeg(const char* filename, UInt* width, UInt* height)
+readJpeg(const char* filename, uint32_t* width, uint32_t* height)
 {
   int channels;
   struct jpeg_decompress_struct info;
@@ -66,14 +65,14 @@ readJpeg(const char* filename, UInt* width, UInt* height)
 
 /*
 UInt8 *
-readJpeg(const char *fn, UInt8 *rgbData, UInt32 *widthP, UInt32 *heightP)
+readJpeg(const char *fn, UInt8 *rgbData, uint32_t *widthP, uint32_t *heightP)
 {
   Assert(widthP != NULL);
   Assert(heightP != NULL);
   
   struct jpeg_decompress_struct cinfo;
   struct jpeg_error_mgr jerr;
-  UInt32 sz;
+  uint32_t sz;
   const UInt8 *p = Readfile(fn, &sz);
   cinfo.err = jpeg_std_error(&jerr);	
   jpeg_create_decompress(&cinfo);
@@ -83,9 +82,9 @@ readJpeg(const char *fn, UInt8 *rgbData, UInt32 *widthP, UInt32 *heightP)
     fatal("%s is not a normal JPEG", fn);
   }
   jpeg_start_decompress(&cinfo);
-  UInt32 width = cinfo.output_width;
-  UInt32 height = cinfo.output_height;
-  UInt32 pixelSize = cinfo.output_components;
+  uint32_t width = cinfo.output_width;
+  uint32_t height = cinfo.output_height;
+  uint32_t pixelSize = cinfo.output_components;
   Assert(pixelSize == 3);
   int rgbSize = width * height * pixelSize;
 
@@ -120,7 +119,7 @@ readJpeg(const char *fn, UInt8 *rgbData, UInt32 *widthP, UInt32 *heightP)
 
 
 void
-writeJpeg(const char* filename, unsigned char** row_pointer, UInt width, UInt height) {
+writeJpeg(const char* filename, unsigned char** row_pointer, uint32_t width, uint32_t height) {
   printf("writing jpeg size %d, %d\n", width, height);
   struct jpeg_compress_struct info;
   struct jpeg_error_mgr err;

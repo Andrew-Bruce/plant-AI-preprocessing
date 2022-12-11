@@ -23,4 +23,4 @@ void
 do_usage(const struct args *ap, const char *usage);
 
 void
-doCommandLineArgs(SInt *argcp, char ***argvp, const struct args *ap, SInt32 minparams, SInt32 maxparams, const char *usage);
+doCommandLineArgs(int32_t *argcp, char ***argvp, const struct args *ap, int32_t minparams, int32_t maxparams, const char *usage);
