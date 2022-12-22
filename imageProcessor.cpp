@@ -42,22 +42,22 @@ plantImage::plantImage(uint8_t** RGB_row_pointers_, int width_, int height_)
 
   
   rgbData = (uint8_t***)make2DPointerArray<uint8_t*>(width, height);
-  for(int y = 0; y < height; y++){
-    for(int x = 0; x < width; x++){
+  for(uint32_t y = 0; y < height; y++){
+    for(uint32_t x = 0; x < width; x++){
       rgbData[y][x] = &(RGB_row_pointers_[y][x*numChannels]);
     }
   }
   
   hsvData = (uint8_t***)make2DPointerArray<uint8_t*>(width, height);
-  for(int y = 0; y < height; y++){
-    for(int x = 0; x < width; x++){
+  for(uint32_t y = 0; y < height; y++){
+    for(uint32_t x = 0; x < width; x++){
       hsvData[y][x] = &(HSV_row_pointers[y][x*numChannels]);
     }
   }
 
   blockMatchOutputData = (uint8_t***)make2DPointerArray<uint8_t*>(width, height);
-  for(int y = 0; y < height; y++){
-    for(int x = 0; x < width; x++){
+  for(uint32_t y = 0; y < height; y++){
+    for(uint32_t x = 0; x < width; x++){
       blockMatchOutputData[y][x] = &(blockMatchOutput_row_pointers[y][x*numChannels]);
     }
   }
@@ -200,8 +200,8 @@ plantImage::normalizeImage(bool doSat, bool doVal, bool ignoreMask)
 {
   uint32_t NormHorizontalBlocks = 16;
   uint32_t NormVerticalBlocks   = 16;
-  uint32_t NormXPixelsPerBlock = width / NormHorizontalBlocks;
-  uint32_t NormYPixelsPerBlock = height / NormVerticalBlocks;
+  //uint32_t NormXPixelsPerBlock = width / NormHorizontalBlocks;
+  //uint32_t NormYPixelsPerBlock = height / NormVerticalBlocks;
 
   
   
@@ -241,8 +241,8 @@ plantImage::setRgbPixel(uint32_t x, uint32_t y, uint8_t red, uint8_t green, uint
 {
   Assert(x < width);
   Assert(y < height);
-  Assert(x >= 0);
-  Assert(y >= 0);
+  //Assert(x >= 0);
+  //Assert(y >= 0);
   rgbData[y][x][0] = red;
   rgbData[y][x][1] = green;
   rgbData[y][x][2] = blue;
@@ -496,10 +496,10 @@ plantImage::saveMapToFile(void){
   if (poop < 0) {
     fatal("Open failed, %s: %s\n", fn, syserr());
   }
-  int n = sizeof(diffFromMean);
+  uint32_t n = sizeof(diffFromMean);
   Assert(n == sizeof(double) * width * height);
   int w = write(poop, diffFromMean, n);
-  if (w != n) {
+  if (w != (int) n) {
     fatal("Write failed, %s: %s\n", fn, syserr());
   }
   close(poop);
@@ -513,10 +513,10 @@ plantImage::getMapFromFile(void){
   if (poop < 0) {
     fatal("Open failed, %s: %s", fn, syserr());
   }
-  int n = sizeof(depthMapOffset);
+  uint32_t n = sizeof(depthMapOffset);
   Assert(n == sizeof(double) * width * height);
   int r = read(poop, depthMapOffset, n);
-  if (r != n) {
+  if (r != (int) n) {
     fatal("Read failed, %s: %s", fn, syserr());
   }
   close(poop);
@@ -934,7 +934,7 @@ plantImage::destroyBadChunks(void){
 
 void
 plantImage::doFloodingUsingMask(){
-  for(int y = 0; y < height; y++){
+  for(uint32_t y = 0; y < height; y++){
     memset(floodedMask[y], 0, width*sizeof(int));
   }
   
@@ -1009,7 +1009,7 @@ plantImage::thresholdHSV(void)
   // int red     = 0;
   int green   = (0xff * 120) / 360;
   int magenta = (0xff * 300) / 360;
-  for(int y = 0; y < height; y++){
+  for(uint32_t y = 0; y < height; y++){
     memset(mask[y], true, width*sizeof(bool));
   }
 

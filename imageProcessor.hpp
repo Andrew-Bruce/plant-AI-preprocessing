@@ -11,8 +11,8 @@ public:
   std::vector<Chunk> chunkInfo;
   std::vector<Chunk> badChunkInfo;
 
-  int width;
-  int height;
+  uint32_t width;
+  uint32_t height;
   
 
   double **depthMapOffset;
