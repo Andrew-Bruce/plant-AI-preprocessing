@@ -1,7 +1,5 @@
-CC	:= g++
-
-CFLAGS	:= -Ofast
-CFLAGS	+= -Wall -Wextra -Wpedantic -Wshadow -std=c++17
+CXXFLAGS	+= -Ofast
+CXXFLAGS	+= -Wall -Wextra -Wpedantic -Wshadow -std=c++17
 
 OBJECTS := main.o
 OBJECTS += imageProcessor.o
@@ -13,7 +11,7 @@ OBJECTS += png.o
 OBJECTS += args.o
 OBJECTS += hsv.o
 
-LIBS	:= $(shell pkg-config --cflags --libs libjpeg libpng)
+LDLIBS	+= $(shell pkg-config --cflags --libs libjpeg libpng)
 
 MAIN_FILES		:= main.cpp common/utils.hpp common/pnm.hpp common/do_args.hpp common/jpeg.hpp common/png.cpp common/hsv.cpp imageProcessor.hpp
 IMAGE_PROCESSOR_FILES	:= imageProcessor.cpp imageProcessor.hpp common/utils.hpp common/hsv.cpp chunk.cpp
@@ -28,31 +26,31 @@ HSV_FILES		:= common/hsv.cpp common/hsv.hpp
 
 
 foo:	$(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) $(LIBS) -o $(@) 
+	$(CXX) $(CXXFLAGS) $(LDLIBS) $(OBJECTS) $(LIBS) -o $(@) 
 
 main.o:			$(MAIN_FILES)
-	$(CC) -c $< -o $(@)
+	$(CXX) $(CXXFLAGS) -c $< -o $(@)
 
 imageProcessor.o:	$(IMAGE_PROCESSOR_FILES)
-	$(CC) -c $< -o $(@)
+	$(CXX) $(CXXFLAGS) -c $< -o $(@)
 
 utils.o:		$(UTILS_FILES)
-	$(CC) -c $< -o $(@)
+	$(CXX) $(CXXFLAGS) -c $< -o $(@)
 
 chunk.o:		$(CHUNK_FILES)
-	$(CC) -c $< -o $(@)
+	$(CXX) $(CXXFLAGS) -c $< -o $(@)
 
 pnm.o:			$(PNM_FILES)
-	$(CC) -c $< -o $(@)
+	$(CXX) $(CXXFLAGS) -c $< -o $(@)
 jpeg.o:			$(JPEG_FILES)
-	$(CC) -c $< -o $(@)
+	$(CXX) $(CXXFLAGS) -c $< -o $(@)
 png.o:			$(PNG_FILES)
-	$(CC) -c $< -o $(@)
+	$(CXX) $(CXXFLAGS) -c $< -o $(@)
 
 args.o:			$(ARGS_FILES)
-	$(CC) -c $< -o $(@)
+	$(CXX) $(CXXFLAGS) -c $< -o $(@)
 hsv.o:			$(HSV_FILES)
-	$(CC) -c $< -o $(@)
+	$(CXX) $(CXXFLAGS) -c $< -o $(@)
 
 clean:
-	rm foo *~ common/*~ *.o
+	$(RM) foo *~ common/*~ *.o
