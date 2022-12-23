@@ -43,7 +43,7 @@ readJpeg(const char* filename, uint32_t* width, uint32_t* height)
 
   unsigned char** row_pointers = (unsigned char**) andyMalloc(*height*sizeof(unsigned char*));
   int bytesPerRow = channels*(*width);
-  for(int y=0; y<*height; y++){
+  for(uint32_t y=0; y<*height; y++){
     row_pointers[y] = (unsigned char*)andyMalloc(bytesPerRow);
   }
 

@@ -21,19 +21,49 @@ static const uint32_t DownShift =  48;
 
 static const int MinPixelsWorthSaving = 1000;
 
-plantImage::plantImage(void){
+plantImage::plantImage(void):
+  RGB_row_pointers(nullptr),
+  HSV_row_pointers(nullptr),
+  hsvData(nullptr),
+  rgbData(nullptr),
+  mask(nullptr),
+  floodedMask(nullptr),
+  chunkInfo(),
+  badChunkInfo(),
+  width(0),
+  height(0),
+  depthMapOffset(nullptr),
+  diffFromMean(nullptr),
+  blockMatchOutput_row_pointers(nullptr),
+  blockMatchOutputData(nullptr),
+  depthMap(nullptr),
+  matchesForPixel(nullptr){
   
 }
 
-plantImage::plantImage(uint8_t** RGB_row_pointers_, int width_, int height_)
+const int numChannels = 3;
+plantImage::plantImage(uint8_t** _RGB_row_pointers, int _width, int _height):
+  RGB_row_pointers(_RGB_row_pointers),
+  HSV_row_pointers((uint8_t**)make2DPointerArray<uint8_t>(_width*numChannels, _height)),
+  hsvData(nullptr),
+  rgbData(nullptr),
+  mask(nullptr),
+  floodedMask(nullptr),
+  chunkInfo(),
+  badChunkInfo(),
+  width(_width),
+  height(_height),
+  depthMapOffset(nullptr),
+  diffFromMean(nullptr),
+  blockMatchOutput_row_pointers(nullptr),
+  blockMatchOutputData(nullptr),
+  depthMap(nullptr),
+  matchesForPixel(nullptr)
 {
-  width = width_;
-  height = height_;
-  RGB_row_pointers = RGB_row_pointers_;
-
-  const int numChannels = 3;
   
-  HSV_row_pointers = (uint8_t**)make2DPointerArray<uint8_t>(width*numChannels, height);
+  
+  
+  HSV_row_pointers = 
   blockMatchOutput_row_pointers = (uint8_t**)make2DPointerArray<uint8_t>(width*numChannels, height);
   
   printf("making new image w h = %d, %d\n", width, height);
@@ -44,7 +74,7 @@ plantImage::plantImage(uint8_t** RGB_row_pointers_, int width_, int height_)
   rgbData = (uint8_t***)make2DPointerArray<uint8_t*>(width, height);
   for(uint32_t y = 0; y < height; y++){
     for(uint32_t x = 0; x < width; x++){
-      rgbData[y][x] = &(RGB_row_pointers_[y][x*numChannels]);
+      rgbData[y][x] = &(_RGB_row_pointers[y][x*numChannels]);
     }
   }
   
@@ -357,13 +387,13 @@ public:
   int y1;
   int c;
 
-  LineThing(int _x0, int _y0, int _x1, int _y1, int _c){
-    x0 = _x0;
-    y0 = _y0;
-    x1 = _x1;
-    y1 = _y1;
-    c = _c;
-  }
+  LineThing(int _x0, int _y0, int _x1, int _y1, int _c):
+    x0(_x0),
+    y0(_y0),
+    x1(_x1),
+    y1(_y1),
+    c(_c)
+  {}
 };
 
 std::vector<LineThing> listOfLines;

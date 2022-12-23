@@ -23,7 +23,8 @@ public:
 
   double **depthMap;
   uint8_t **matchesForPixel;
-
+  //plantImage(const plantImage&);
+  //bool operator=(const plantImage&);
   
   void convertRgbImageToHsv(void);
   void convertHsvImageToRgb(void);

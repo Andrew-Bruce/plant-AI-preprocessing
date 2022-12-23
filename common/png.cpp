@@ -202,7 +202,7 @@ readPng(const char *filename, int* width, int* height, unsigned char* bit_depth,
   *color_type = png_get_color_type(png_ptr, info_ptr);
   *bit_depth = png_get_bit_depth(png_ptr, info_ptr);
     
-  int number_of_passes = png_set_interlace_handling(png_ptr);
+  //int number_of_passes = png_set_interlace_handling(png_ptr);
   png_read_update_info(png_ptr, info_ptr);
   
   if(setjmp(png_jmpbuf(png_ptr))){

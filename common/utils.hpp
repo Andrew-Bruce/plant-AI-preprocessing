@@ -48,4 +48,4 @@ std::vector<std::string> getListOfFiles(const char *s);
 
 
 template <class T> T** make2DPointerArray(int height, int width);
-template <class T> void free2DPointerArray(T** p, int height, int width);
+template <class T> void free2DPointerArray(T** p, int height);

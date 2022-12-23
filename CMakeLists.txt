@@ -31,8 +31,6 @@ add_executable(foo
 	)
 
 
-target_compile_features(foo PRIVATE cxx_range_for)
-
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 target_link_libraries(foo ${OpenCV_LIBS})

@@ -119,7 +119,7 @@ template <class T> T** make2DPointerArray(int width, int height){
   return row_pointers;
 }
 
-template <class T> void free2DPointerArray(T** row_pointers, int width, int height){
+template <class T> void free2DPointerArray(T** row_pointers, int height){
   for(int y=0; y<height; y++){
     free(row_pointers[y]);
   }
@@ -132,10 +132,10 @@ template bool** make2DPointerArray<bool>(int, int);
 template double** make2DPointerArray<double>(int, int);
 template int** make2DPointerArray<int>(int, int);
 
-template void free2DPointerArray<bool>(bool**, int, int);
-template void free2DPointerArray<double>(double**, int, int);
-template void free2DPointerArray<unsigned char>(unsigned char**, int, int);
-template void free2DPointerArray<unsigned char*>(unsigned char***, int, int);
-template void free2DPointerArray<int>(int **, int, int);
+template void free2DPointerArray<bool>(bool**, int);
+template void free2DPointerArray<double>(double**, int);
+template void free2DPointerArray<unsigned char>(unsigned char**, int);
+template void free2DPointerArray<unsigned char*>(unsigned char***, int);
+template void free2DPointerArray<int>(int **, int);
 
 

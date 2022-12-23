@@ -29,10 +29,10 @@
 
 static const char ImageFile[] = "images/plant4.jpg";
 
-class Globals {
+struct Globals {
 public:
-  uint32_t imageWidth;
-  uint32_t imageHeight;
+  uint32_t imageWidth = 0;
+  uint32_t imageHeight = 0;
   struct {
     bool chopup;
     bool savefr;
@@ -44,16 +44,11 @@ public:
     bool roundtrip;
     bool blockmatch;
     bool saveImage;
-  } flags;
+  } flags = {false, false, false, false, false, false, false, false, false, false};
   
-  plantImage currentImage;
-  
-
-  Globals(void){
-
-  }
+  plantImage currentImage = plantImage();
 };
-static Globals g = Globals();
+static Globals g;
 
 
 
@@ -154,7 +149,8 @@ saveChunk(Chunk* chunk, int fileNumber){
     sprintf(filename, "chunks/img_depth%05d.png", fileNumber);
     writePng(filename, pixels, chunk->w, chunk->h, 8, 2);
   }
-  free2DPointerArray<uint8_t>(pixels, chunk->w*3, chunk->h);
+  //free2DPointerArray<uint8_t>(pixels, chunk->w*3, chunk->h);
+  free2DPointerArray<uint8_t>(pixels, chunk->h);
 }
 
 void
