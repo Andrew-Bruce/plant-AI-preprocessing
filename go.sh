@@ -1,8 +1,8 @@
 
 
-#./foo -threshold -saveimage -normboth
+#./build/foo -threshold -saveimage -normboth
 
-./foo -threshold -saveimage -normboth -chopup -savefr
-#./foo -threshold -normboth -chopup
+./build/foo -threshold -saveimage -normboth -chopup -savefr
+#./build/foo -threshold -normboth -chopup
 
-#./foo -threshold -saveimage
+#./build/foo -threshold -saveimage
